@@ -1,4 +1,11 @@
-export type NotificationType = 'follow' | 'like' | 'comment' | 'collection_add' | 'new_post';
+export type NotificationType =
+  | 'follow'
+  | 'like'
+  | 'comment'
+  | 'collection_add'
+  | 'new_post'
+  | 'mention'
+  | 'comment_like';
 
 export interface AppNotification {
   id: string;

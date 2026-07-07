@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useFeed, type PageFetcher } from '@/features/feed/useFeed';
+import { useOffsetFeed, type OffsetPageFetcher } from '@/features/feed/useOffsetFeed';
 import FeedList from '@/features/feed/FeedList';
 import PersonRow from '@/features/search/PersonRow';
 import { SearchIcon } from '@/components/icons';
@@ -22,13 +22,12 @@ export default function Search() {
     return () => clearTimeout(t);
   }, [input]);
 
-  const recipeFetcher: PageFetcher = useCallback(
-    async (cursor, limit) => {
+  const recipeFetcher: OffsetPageFetcher = useCallback(
+    async (offset, limit) => {
       if (!query) return [];
       const { data, error } = await supabase.rpc('search_recipes', {
         p_query: query,
-        p_cursor_created: cursor?.created ?? null,
-        p_cursor_id: cursor?.id ?? null,
+        p_offset: offset,
         p_limit: limit,
       });
       if (error) throw error;
@@ -36,7 +35,7 @@ export default function Search() {
     },
     [query],
   );
-  const recipeFeed = useFeed(recipeFetcher, [query]);
+  const recipeFeed = useOffsetFeed(recipeFetcher, [query]);
 
   // People search has no keyset pagination (capped top-N) — plain fetch per query.
   useEffect(() => {

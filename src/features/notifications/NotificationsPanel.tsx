@@ -78,5 +78,9 @@ function message(n: AppNotification): string {
       return `שמר את "${title}" לאוסף`;
     case 'new_post':
       return `פרסם מתכון חדש: "${title}"`;
+    case 'mention':
+      return `תייג אותך בתגובה על "${title}"`;
+    case 'comment_like':
+      return `אהב את התגובה שלך על "${title}"`;
   }
 }
