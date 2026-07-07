@@ -7,12 +7,14 @@ import Home from '@/pages/Home';
 import Following from '@/pages/Following';
 import Search from '@/pages/Search';
 import CreateRecipe from '@/features/create/CreateRecipe';
+import NewRecipeChoice from '@/features/create/NewRecipeChoice';
 import RecipeDetail from '@/features/recipe/RecipeDetail';
 import Profile from '@/pages/Profile';
 import EditProfile from '@/pages/EditProfile';
 import Board from '@/pages/Board';
 import Admin from '@/pages/Admin';
 import { LogoMark, BanIcon } from '@/components/icons';
+import InAppBrowserBanner from '@/components/InAppBrowserBanner';
 
 function Splash() {
   return (
@@ -57,27 +59,53 @@ function AdminRoute() {
 export default function App() {
   const { session, profile, loading } = useAuth();
 
+  // Shown above every branch below — an in-app-browser session that never
+  // persists is the same problem whether you're logged in or still on Login.
+  const banner = <InAppBrowserBanner />;
+
   // 1. Still resolving session/profile.
-  if (loading) return <Splash />;
+  if (loading) return (
+    <>
+      {banner}
+      <Splash />
+    </>
+  );
 
   // 2. Not signed in.
-  if (!session) return <Login />;
+  if (!session) return (
+    <>
+      {banner}
+      <Login />
+    </>
+  );
 
   // 3. Signed in but no username yet -> mandatory one-time onboarding.
-  if (!profile?.username) return <Onboarding />;
+  if (!profile?.username) return (
+    <>
+      {banner}
+      <Onboarding />
+    </>
+  );
 
   // 4. Banned accounts get a lockout screen instead of the app.
-  if (profile.is_banned) return <Banned />;
+  if (profile.is_banned) return (
+    <>
+      {banner}
+      <Banned />
+    </>
+  );
 
   // 5. Full app.
   return (
     <BrowserRouter>
+      {banner}
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/following" element={<Following />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/create" element={<CreateRecipe />} />
+          <Route path="/create" element={<NewRecipeChoice />} />
+          <Route path="/create/new" element={<CreateRecipe />} />
           <Route path="/r/:id/edit" element={<CreateRecipe />} />
           <Route path="/r/:id" element={<RecipeDetail />} />
           <Route path="/u/:username" element={<Profile />} />

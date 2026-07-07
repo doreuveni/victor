@@ -11,7 +11,6 @@ export default function Login() {
           <LogoMark size={48} />
         </div>
         <h1 className="font-display ltr text-3xl text-stone-900">Victor</h1>
-        <p className="mt-2 text-stone-500">ספר המתכונים החברתי שלך</p>
       </div>
 
       <button

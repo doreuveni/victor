@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import SmartImage from '@/components/SmartImage';
 import { LogoMark, BackIcon, CommentIcon, CheckIcon, EmptyBowlIcon, MoreIcon } from '@/components/icons';
 import LikeButton from '@/features/social/LikeButton';
+import ShareButton from '@/features/social/ShareButton';
 import SaveButton from '@/features/collections/SaveButton';
 import CommentsSection from '@/features/comments/CommentsSection';
 import ReportButton from '@/features/reports/ReportButton';
@@ -201,6 +202,7 @@ export default function RecipeDetail() {
           <span className="flex items-center gap-1.5 text-sm">
             <CommentIcon /> {commentCount}
           </span>
+          <ShareButton title={recipe.title} path={`/r/${recipe.id}`} />
           <div className="flex-1" />
           <SaveButton recipeId={recipe.id} />
         </div>

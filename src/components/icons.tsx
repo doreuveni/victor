@@ -125,6 +125,68 @@ export function CameraIcon({ size = 22, className }: IconProps) {
   );
 }
 
+export function ScanIcon({ size = 22, className }: IconProps) {
+  // Viewfinder corners around a sparkle — "read this photo" for AI import.
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M4 8V6a2 2 0 0 1 2-2h2M18 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" strokeLinecap="round" />
+      <path d="M12 8.5 13 11l2.5 1-2.5 1-1 2.5-1-2.5L8.5 12l2.5-1Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ShareIcon({ size = 20, className }: IconProps) {
+  // Paper-plane send icon — matches the IG/Telegram "share" convention.
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M3 11 20.5 3.5 15 20l-3.5-6L3 11Z" strokeLinejoin="round" />
+      <path d="M11.5 14 20.5 3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function WhatsAppIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M6.3 17.7 4 20l2.4-2.2A8 8 0 1 1 12 20a8 8 0 0 1-5.7-2.3Z" strokeLinejoin="round" />
+      <path d="M9 9.5c0 3 2.5 5.5 5.5 5.5.6 0 .8-.3.6-.8l-.6-1.3c-.2-.4-.6-.5-1-.3l-.5.3c-.9-.5-1.6-1.2-2.1-2.1l.3-.5c.2-.4.1-.8-.3-1L9.8 9c-.5-.2-.8 0-.8.6Z" />
+    </svg>
+  );
+}
+
+export function LinkIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M9.5 14.5 14.5 9.5" strokeLinecap="round" />
+      <path d="M11 8l1.5-1.5a3.5 3.5 0 0 1 5 5L16 13" strokeLinecap="round" />
+      <path d="M13 16l-1.5 1.5a3.5 3.5 0 0 1-5-5L8 11" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function GripIcon({ size = 18, className }: IconProps) {
+  // Drag-handle: two columns of dots, standard reorder affordance.
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} fill="currentColor" stroke="none">
+      <circle cx="9" cy="6" r="1.4" />
+      <circle cx="9" cy="12" r="1.4" />
+      <circle cx="9" cy="18" r="1.4" />
+      <circle cx="15" cy="6" r="1.4" />
+      <circle cx="15" cy="12" r="1.4" />
+      <circle cx="15" cy="18" r="1.4" />
+    </svg>
+  );
+}
+
+export function CopyIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function CheckIcon({ size = 13, className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={3}>

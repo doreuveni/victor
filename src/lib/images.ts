@@ -38,6 +38,36 @@ async function loadImage(blob: Blob): Promise<HTMLImageElement> {
   return img;
 }
 
+const AI_VISION_MAX_DIM = 1400; // long edge, px — plenty for OCR-style transcription, keeps Claude's per-image token cost down
+const AI_VISION_QUALITY = 0.85;
+
+/**
+ * Downscale a user-picked image for sending to Claude's vision API as base64.
+ * Returns raw base64 (no `data:` prefix) JPEG data — separate from
+ * `processImage()` because the target size/quality tradeoff is different
+ * (optimized for legible text at low token cost, not for display).
+ */
+export async function downscaleForVision(file: File): Promise<string> {
+  const img = await decodeToImage(file);
+  try {
+    const scale = Math.min(1, AI_VISION_MAX_DIM / Math.max(img.width, img.height));
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('canvas unsupported');
+    ctx.drawImage(img, 0, 0, w, h);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', AI_VISION_QUALITY);
+    return dataUrl.slice(dataUrl.indexOf(',') + 1);
+  } finally {
+    URL.revokeObjectURL(img.src);
+  }
+}
+
 /**
  * Process a user-picked image file into a compressed JPEG Blob.
  * Handles iPhone HEIC, downscales to MAX_DIM, strips metadata.

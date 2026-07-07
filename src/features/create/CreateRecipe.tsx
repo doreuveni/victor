@@ -239,10 +239,12 @@ export default function CreateRecipe() {
             <button
               key={label}
               onClick={() => setStep(i)}
-              className="flex min-h-11 flex-1 items-center"
-              aria-label={label}
+              className="flex min-h-11 flex-1 flex-col items-center gap-1"
             >
               <span className={`h-1.5 w-full rounded-full ${i <= step ? 'bg-brand-500' : 'bg-stone-200'}`} />
+              <span className={`text-[10px] ${i === step ? 'font-semibold text-brand-600' : 'text-stone-400'}`}>
+                {label}
+              </span>
             </button>
           ))}
         </div>
