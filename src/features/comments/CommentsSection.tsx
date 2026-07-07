@@ -5,7 +5,6 @@ import { useAuth } from '@/context/AuthProvider';
 import { formatRelative } from '@/lib/time';
 import Avatar from '@/components/Avatar';
 import { XIcon } from '@/components/icons';
-import ReportButton from '@/features/reports/ReportButton';
 import CommentLikeButton from './CommentLikeButton';
 import MentionInput from './MentionInput';
 import type { Comment } from './types';
@@ -16,8 +15,11 @@ interface Props {
   onCountChange: (delta: number) => void;
 }
 
+// profiles!comments_author_id_fkey — explicit FK name required since
+// comment_likes (also FK'd to profiles) gives PostgREST a second path from
+// comments to profiles; a bare "profiles" embed is now ambiguous (PGRST201).
 const SELECT =
-  'id, recipe_id, author_id, parent_comment_id, body, like_count, created_at, author:profiles ( username, display_name, avatar_url )';
+  'id, recipe_id, author_id, parent_comment_id, body, like_count, created_at, author:profiles!comments_author_id_fkey ( username, display_name, avatar_url )';
 
 const MENTION_RE = /@([a-zA-Z0-9_]{3,20})/g;
 
@@ -40,17 +42,28 @@ function renderBody(body: string) {
 export default function CommentsSection({ recipeId, recipeOwnerId, onCountChange }: Props) {
   const { session, profile } = useAuth();
   const [comments, setComments] = useState<Comment[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [body, setBody] = useState('');
   const [posting, setPosting] = useState(false);
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
 
   useEffect(() => {
+    setLoadError(false);
     supabase
       .from('comments')
       .select(SELECT)
       .eq('recipe_id', recipeId)
       .order('created_at', { ascending: true })
-      .then(({ data }) => setComments((data ?? []) as unknown as Comment[]));
+      .then(({ data, error }) => {
+        if (error) {
+          console.error(
+            `comments select failed: code=${error.code} message=${error.message} details=${error.details} hint=${error.hint}`,
+          );
+          setLoadError(true);
+          return;
+        }
+        setComments(data as unknown as Comment[]);
+      });
   }, [recipeId]);
 
   const { topLevel, repliesByParent } = useMemo(() => {
@@ -95,41 +108,40 @@ export default function CommentsSection({ recipeId, recipeOwnerId, onCountChange
   const canDelete = (c: Comment) =>
     c.author_id === session?.user.id || recipeOwnerId === session?.user.id || !!profile?.is_admin;
 
+  // Matches Instagram's comment layout exactly: username inline with the
+  // comment text on the first line; timestamp + reply link on a second line
+  // below it; the like heart (with its count stacked underneath, not beside
+  // it) sits in its own column at the row's outer edge, vertically aligned
+  // with the first line — not grouped with timestamp/reply at all.
   function CommentRow({ c, isReply }: { c: Comment; isReply?: boolean }) {
     return (
       <li className={`flex gap-2.5 ${isReply ? 'ms-9 mt-3' : ''}`}>
         <Avatar url={c.author?.avatar_url} name={c.author?.display_name || c.author?.username} size={isReply ? 26 : 32} />
         <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-2">
-            <Link to={`/u/${c.author?.username}`} className="text-sm font-semibold hover:underline">
+          <p className="whitespace-pre-wrap break-words text-stone-800">
+            <Link to={`/u/${c.author?.username}`} className="font-semibold hover:underline">
               {c.author?.display_name || c.author?.username || 'משתמש'}
-            </Link>
-            <span className="text-xs text-stone-400">{formatRelative(c.created_at)}</span>
-          </div>
-          <p className="whitespace-pre-wrap break-words text-stone-800">{renderBody(c.body)}</p>
-          <div className="mt-1 flex items-center gap-3">
-            <CommentLikeButton commentId={c.id} initialCount={c.like_count} />
-            {!isReply && (
-              <button
-                onClick={() => setReplyTo(c)}
-                className="min-h-11 text-xs text-stone-400 hover:text-brand-600"
-              >
-                הגב
-              </button>
-            )}
+            </Link>{' '}
+            {renderBody(c.body)}
+          </p>
+          <div className="mt-1 flex items-center gap-3 text-xs text-stone-400">
+            <span>{formatRelative(c.created_at)}</span>
+            <button onClick={() => setReplyTo(c)} className="min-h-11 font-semibold text-stone-500 hover:text-brand-600">
+              הגב
+            </button>
           </div>
         </div>
-        <div className="flex shrink-0 items-start gap-2 self-start">
-          {c.author_id !== session?.user.id && <ReportButton targetType="comment" targetId={c.id} />}
-          {canDelete(c) && (
-            <button
-              onClick={() => remove(c.id)}
-              className="flex h-11 w-11 items-center justify-center text-stone-300 hover:text-danger-500"
-              aria-label="מחק תגובה"
-            >
-              <XIcon size={15} />
-            </button>
-          )}
+        {canDelete(c) && (
+          <button
+            onClick={() => remove(c.id)}
+            className="flex h-11 w-11 shrink-0 items-center justify-center self-start text-stone-300 hover:text-danger-500"
+            aria-label="מחק תגובה"
+          >
+            <XIcon size={15} />
+          </button>
+        )}
+        <div className="shrink-0 self-start">
+          <CommentLikeButton commentId={c.id} initialCount={c.like_count} />
         </div>
       </li>
     );
@@ -139,7 +151,9 @@ export default function CommentsSection({ recipeId, recipeOwnerId, onCountChange
     <section>
       <h2 className="mb-2 text-lg font-bold">תגובות</h2>
 
-      {comments === null ? (
+      {loadError ? (
+        <p className="py-4 text-sm text-danger-600">טעינת התגובות נכשלה. נסה לרענן את הדף.</p>
+      ) : comments === null ? (
         <p className="py-4 text-center text-sm text-stone-500 animate-pulse">טוען…</p>
       ) : topLevel.length === 0 ? (
         <p className="py-4 text-sm text-stone-500">אין עדיין תגובות. היה הראשון להגיב.</p>

@@ -147,7 +147,7 @@ export default function Profile() {
             empty={profile.is_self ? 'עדיין לא פרסמת מתכון.' : 'עדיין אין מתכונים.'}
           />
         ) : (
-          <BoardsGrid ownerId={profile.id} />
+          <BoardsGrid ownerId={profile.id} isSelf={profile.is_self} />
         )}
       </div>
     </div>

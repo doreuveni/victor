@@ -47,10 +47,11 @@ export default function CommentLikeButton({ commentId, initialCount }: Props) {
     <button
       onClick={toggle}
       disabled={busy}
-      className={`flex min-h-11 items-center gap-1 text-xs transition ${liked ? 'text-danger-500' : 'text-stone-400 hover:text-danger-500'}`}
+      className={`flex min-h-11 min-w-11 flex-col items-center justify-center gap-0.5 transition ${liked ? 'text-danger-500' : 'text-stone-400 hover:text-danger-500'}`}
       aria-label={liked ? 'הסר לייק' : 'לייק'}
     >
-      <HeartIcon size={14} filled={liked} /> {count > 0 && count}
+      <HeartIcon size={14} filled={liked} />
+      <span className="text-[11px] leading-none">{count > 0 ? count : ''}</span>
     </button>
   );
 }

@@ -10,8 +10,6 @@ interface Props {
   loadingMore: boolean;
   loadMore: () => void;
   empty: string;
-  /** shown once the list is exhausted (hasMore=false); defaults to a generic line. */
-  endMessage?: string;
   /** 'list' (default): one full-width column. 'grid': uniform 3-column tiles. */
   view?: 'list' | 'grid';
   /** width/height for grid tiles — ignored in list view. */
@@ -26,7 +24,6 @@ export default function FeedList({
   loadingMore,
   loadMore,
   empty,
-  endMessage = '— זהו הכול —',
   view = 'list',
   gridAspect = 1,
 }: Props) {
@@ -98,7 +95,6 @@ export default function FeedList({
       )}
       <div ref={sentinel} className="h-8" />
       {loadingMore && <p className="py-3 text-center text-sm text-stone-500 animate-pulse">טוען עוד…</p>}
-      {!hasMore && items.length > 0 && <p className="py-6 text-center text-xs text-stone-400">{endMessage}</p>}
     </>
   );
 }

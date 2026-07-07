@@ -97,7 +97,6 @@ export default function Home() {
         view={view}
         gridAspect={COVER_ASPECT}
         empty={search || category ? 'לא נמצאו מתכונים תואמים.' : 'אין עדיין מתכונים. היה הראשון לפרסם!'}
-        endMessage="אין יותר מתכונים חדשים לכו להכין"
       />
     </div>
   );
